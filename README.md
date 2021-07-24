@@ -77,10 +77,10 @@ docker ps
 ```
 컨테이너도 하나의 프로세스!
 
-COMMAND: 컨테이너 시작 시 실행될 명령어   
-STATUS: Up - 실행 중, Exited - 종료, Pause - 일시정지   
-PORTS: 컨테이너가 개방한 포트와 호스트에 연결한 포트   
-NAMES: 컨테이너의 고유한 이름. 컨테이너 생성 시 --name 옵션으로 설정 가능   
+- COMMAND: 컨테이너 시작 시 실행될 명령어   
+- STATUS: Up - 실행 중, Exited - 종료, Pause - 일시정지   
+- PORTS: 컨테이너가 개방한 포트와 호스트에 연결한 포트   
+- NAMES: 컨테이너의 고유한 이름. 컨테이너 생성 시 --name 옵션으로 설정 가능   
 \+ docker rename original-name changed-name으로 재설정 가능
 
 ### 모든 컨테이너 나열
@@ -92,18 +92,22 @@ docker ps -a
 ![캡처](https://user-images.githubusercontent.com/68456385/126862887-f9f4a048-cf58-4029-a862-4b270d0ddb33.PNG)
 
 ### 컨테이너 중지
+\* docker run alpine ping localhost로 실행시켜 놓고 테스트
+
+1. Stop
+
+Gracefully하게 중지   
+하고 있던 작업이 모두 끝나면 중지
 ```
 docker stop <컨테이너 id/이름>
 ```
-Gracefully하게 중지   
-하고 있던 작업이 모두 끝나면 중지
 
+2. Kill
+
+바로 중지
 ```
 docker kill <컨테이너 id/이름>
 ```
-바로 중지
-
-\* docker run alpine ping localhost로 실행시켜 놓고 테스트
 
 ### 컨테이너 삭제
 ```
