@@ -1,4 +1,6 @@
 # Docker Study
+출처: https://www.inflearn.com/course/%EB%94%B0%EB%9D%BC%ED%95%98%EB%A9%B0-%EB%B0%B0%EC%9A%B0%EB%8A%94-%EB%8F%84%EC%BB%A4-ci/
+
 ## 1. 도커 기본
 ### 도커를 쓰는 이유
 프로그램을 설치하는 과정에서 서버, 패키지 버전, 운영체제, 종속성 등에 따라 많은 에러가 발생함
@@ -78,7 +80,7 @@ docker ps
 컨테이너도 하나의 프로세스!
 
 COMMAND: 컨테이너 시작 시 실행될 명령어   
-STATUS: Up - 실행 중, Exited - 종료, Pause - 일시정지   
+STATUS: Up - 실행 중, Exited - 종료, Pause - 중지   
 PORTS: 컨테이너가 개방한 포트와 호스트에 연결한 포트   
 NAMES: 컨테이너의 고유한 이름. 컨테이너 생성 시 --name 옵션으로 설정 가능   
 \+ docker rename original-name changed-name으로 재설정 가능
@@ -161,3 +163,40 @@ docker exec -it <컨테이너 id> sh
 매번 exec 명령어를 작성하지 않아도 됨
 
 터미널 종료는 ctrl + d
+
+## 3. 도커 이미지 만들기
+### 도커 이미지 생성 과정
+![캡처](https://user-images.githubusercontent.com/68456385/127467823-1393ddaa-573d-4844-b054-9396b6616590.PNG)
+
+### Dockerfile 작성 순서
+1. 베이스 이미지 명시(파일 스냅샷)   
+FROM <이미지 이름>:<태그>   
+태그가 없으면 최신 버전 사용   
+latest - 최신 버전
+2. 추가적으로 필요한 파일을 다운 받기 위한 명령어 명시(파일 스냅샷)   
+RUN <쉘 명령어>
+3. 컨테이너 시작 시 실행될 명령어 명시   
+CMD [<실행 파일 또는 쉘 스크립트>]
+
+![캡처](https://user-images.githubusercontent.com/68456385/127468594-6b58b43d-ad08-465d-9187-561900473c59.PNG)
+
+### 이미지 생성
+```
+docker build ./
+또는
+docker build .
+```
+현재 디렉토리 내에서 Dockerfile을 찾아서 도커 클라이언트에 전달
+
+1. 베이스 이미지 불러옴
+2. 베이스 이미지를 바탕으로 임시 컨테이너 생성
+3. 임시 컨테이너에 파일 스냅샷, 실행할 명령어를 추가
+4. 임시 컨테이너로 새로운 이미지 생성
+5. 임시 컨테이너 삭제
+
+![캡처](https://user-images.githubusercontent.com/68456385/127471637-3be9b512-2a9b-4b49-80e0-704ddf0ddc24.PNG)
+
+이미지에 이름 주기
+```
+docker build -t <도커 id>/<이름>:<태그> .
+```
