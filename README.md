@@ -62,7 +62,7 @@ VM에서 어플리케이션을 실행하기 위해선 VM을 띄우고 자원을 
 docker - 도커 클라이언트 언급
 ### 도커 이미지 내부 파일 구조 보기
 ```
-docker run <이미지> ls
+docker run <이미지 id/이름> ls
 ```
 이미지 이름 뒤에 추가 커맨드를 입력하면, 이미지가 가지고 있는 시작 명령어를 무시하고 뒤에 있는 커맨드 실행
 
@@ -203,4 +203,132 @@ docker build .
 이미지에 이름 주기
 ```
 docker build -t <도커 id>/<이름>:<태그> .
+```
+
+## 4. 도커를 이용하여 Node.js 앱 만들기
+### Dockerfile
+```Dockerfile
+# npm이 들어있는 베이스 이미지
+FROM node:10
+
+# package.json에 있는 Node.js 모듈(dependency) 설치
+RUN npm install
+
+CMD ["node", "index.js"]
+```
+-> docker build   
+-> npm install 에러   
+=> package.json이 임시 컨테이너에 없기 때문에 발생
+
+-> COPY 이용   
+COPY <복사할 로컬 파일 경로> <컨테이너에서 파일이 복사될 경로>
+```Dockerfile
+# npm이 들어있는 베이스 이미지
+FROM node:10
+
+COPY package.json ./
+
+# package.json에 있는 Node.js 모듈(dependency) 설치
+RUN npm install
+
+CMD ["node", "index.js"]
+```
+-> docker run   
+-> node index.js 에러   
+=> index.js가 컨테이너에 없기 때문에 발생
+
+-> COPY로 디렉토리 내 모든 파일 복사
+```Dockerfile
+# npm이 들어있는 베이스 이미지
+FROM node:10
+
+# 디렉토리 내 모든 파일 복사
+COPY ./ ./
+
+# package.json에 있는 Node.js 모듈(dependency) 설치
+RUN npm install
+
+CMD ["node", "index.js"]
+```
+웹 서버가 정상적으로 실행되지만 페이지 접속이 되지 않음   
+-> 포트 매핑 필요
+
+```
+docker run -p <브라우저에서 접속할 포트번호>:<컨테이너에서 연결할 포트번호> <이미지 id/이름>
+```
+
+### Working Directory 명시
+docker run ~ ls 명령어를 입력해보면 root 디렉토리에 copy한 파일들이 복사된 것을 확인할 수 있음   
+-> 만약 원래 이미지에 있던 파일과 이름이 같다면 기존 파일이 덮어씌워짐   
+-> 어플리케이션을 위한 파일들은 work 디렉토리를 따로 만들어서 보관  
+
+```Dockerfile
+# npm이 들어있는 베이스 이미지
+FROM node:10
+
+# Work 디렉토리 생성
+WORKDIR /usr/src/app
+
+# 디렉토리 내 모든 파일 복사
+COPY ./ ./
+
+# package.json에 있는 Node.js 모듈(dependency) 설치
+RUN npm install
+
+CMD ["node", "index.js"]
+```
+
+### 애플리케이션 소스 변경
+컨테이너 백그라운드로 실행
+```
+docker run -d <이미지 id/이름>
+```
+
+Dockerfile의 각 명령어는 파일 변경이 없다면 캐시를 이용하여 빠르게 실행됨   
+만약 소스 파일이 변경되면 바뀐 소스 파일로 명령어를 실행하여 이미지를 다시 만들고 실행해야됨   
+
+COPY ./ ./   
+-> 소스 코드가 하나라도 변경되면 캐시를 사용하지 않고 명령어를 다시 실행하여 변경된 파일 복사   
+-> RUN npm install 명령어도 다시 실행   
+-> node_module에 있는 종속성들까지 다시 다운
+
+```Dockerfile
+# npm이 들어있는 베이스 이미지
+FROM node:10
+
+# Work 디렉토리 생성
+WORKDIR /usr/src/app
+
+COPY package.json ./
+
+# package.json에 있는 Node.js 모듈(dependency) 설치
+RUN npm install
+
+# 디렉토리 내 모든 파일 복사
+COPY ./ ./
+
+CMD ["node", "index.js"]
+```
+-> package.json은 변경이 없기 때문에 첫번째 COPY와 RUN 명령어가 캐시를 이용하여 실행되고, 
+그 다음 명령어만 다시 실행됨
+
+### Docker Volume
+이미지를 빌드하지 않고 변경사항을 적용할 수는 없을까?
+
+Volume 이용
+![image](https://user-images.githubusercontent.com/68456385/128387894-c25a1c06-35e1-4adf-9c97-66e67128d3ea.png)
+복사가 아닌 참조를 하기 때문에 변경사항이 바로 적용된다
+
+```
+mac: docker run -d -p 5000:8080 -v /usr/src/app/node_modules -v $(pwd):/usr/src/app <이미지 id/이름>
+windows(cmd에서 해야됨): docker run -d -p 5000:8080 -v /usr/src/app/node_modules -v %cd%:/usr/src/app <이미지 id/이름>
+```
+첫번째 -v: 로컬 디렉토리에는 npm install을 하지 않아 node_modules가 없어 참조하지 않도록 함
+두번째 -v: 현재 경로에 있는 파일들을 : 뒤에 오는 컨테이너 경로에서 참조
+
+=> 이미지를 새로 빌드하지 않고 다시 실행만 시켜주면 변경사항이 적용됨
+
+모든 volume 삭제
+```
+docker volume rm $(docker volume ls -qf dangling=true)
 ```
