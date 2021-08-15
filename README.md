@@ -323,12 +323,56 @@ Volume 이용
 mac: docker run -d -p 5000:8080 -v /usr/src/app/node_modules -v $(pwd):/usr/src/app <이미지 id/이름>
 windows(cmd에서 해야됨): docker run -d -p 5000:8080 -v /usr/src/app/node_modules -v %cd%:/usr/src/app <이미지 id/이름>
 ```
-첫번째 -v: 로컬 디렉토리에는 npm install을 하지 않아 node_modules가 없어 참조하지 않도록 함
-두번째 -v: 현재 경로에 있는 파일들을 : 뒤에 오는 컨테이너 경로에서 참조
+- 첫번째 -v: 로컬 디렉토리에는 npm install을 하지 않아 node_modules가 없어 참조하지 않도록 함   
+- 두번째 -v: 현재 경로에 있는 파일들을 : 뒤에 오는 컨테이너 경로에서 참조
 
 => 이미지를 새로 빌드하지 않고 다시 실행만 시켜주면 변경사항이 적용됨
 
 모든 volume 삭제
 ```
 docker volume rm $(docker volume ls -qf dangling=true)
+```
+
+## 5. Docker Compose
+### Redis(Remote Dictionary Server)
+- 메모리 기반의 키-값 구조 데이터 관리 시스템   
+- 데이터를 빠르게 조회할 수 있는 비관계형 데이터베이스(NoSQL)   
+- 메모리에 데이터를 저장하기 때문에 데이터를 불러올 때 빠르게 처리 가능   
+- 메모리에 저장하지만 서버를 재부팅해도 데이터를 영속적으로 보관 가능   
+
+Redis 서버 이미지와 node.js 애플리케이션 이미지를 각각 실행시켜보면 에러가 발생함
+
+![캡처](https://user-images.githubusercontent.com/68456385/129476593-43c775a8-1cdf-41bb-ae61-c9bd831ee58a.PNG)
+
+컨테이너 간 통신 시 아무 설정 없이는 접근 불가   
+-> Docker Compose 이용
+
+### Docker Compose
+다중 컨테이너 도커 애플리케이션을 정의하고 실행하기 위한 도구   
+멀티 컨테이너 상황에서 네트워크를 쉽게 연결시켜줌
+
+### Docker Compose 명령어
+이미지가 존재하지 않는 경우에만 이미지를 빌드하고 컨테이너 시작
+```
+docker-compose up
+```
+
+항상 이미지를 새로 빌드하고 컨테이너 시작
+```
+docker-compose up --build
+```
+
+실행 중인 컨테이너들을 모두 중단
+```
+docker-compose down
+```
+
+컨테이너를 백그라운드에서 실행(detached 모드)
+```
+docker-compose up -d
+```
+
+이미지를 빌드만 하고 컨테이너를 시작하지는 않음
+```
+docker-compose build
 ```
