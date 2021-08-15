@@ -1,0 +1,15 @@
+# 도커 컴포즈 버전
+version: "3"
+# 실행하려는 컨테이너 정의
+services:
+  # 컨테이너 이름
+  redis-server:
+    # 컨테이너에서 사용할 이미지
+    image: "redis"
+  node-app:
+    # 빌드 시 사용할 도커 파일 경로
+    build: .
+    # 포트 맵핑(로컬:컨테이너)
+    ports: 
+      - "5000:8080"
+      
