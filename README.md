@@ -180,7 +180,8 @@ latest - 최신 버전
 2. 추가적으로 필요한 파일을 다운 받기 위한 명령어 명시(파일 스냅샷)   
 RUN <쉘 명령어>
 3. 컨테이너 시작 시 실행될 명령어 명시   
-CMD [<실행 파일 또는 쉘 스크립트>]
+CMD [<실행 파일 또는 쉘 스크립트>]   
+CMD를 여러번 작성할 순 있지만, 가장 마지막에 작성된 CMD만 실행됨
 
 ![캡처](https://user-images.githubusercontent.com/68456385/127468594-6b58b43d-ad08-465d-9187-561900473c59.PNG)
 
@@ -376,3 +377,40 @@ docker-compose up -d
 ```
 docker-compose build
 ```
+## 6. 단일 컨테이너 앱 배포
+### Dockerfile 분리
+개발 환경 - Dockerfile.dev   
+운영 환경 - Dockerfile
+
+Dockerfile.dev로 빌드
+```
+docker build -f Dockerfile.dev .
+```
+
+\* 리액트 이미지를 run하려면 -it 옵션을 주어야 함
+
+포트, 볼륨 등 설정을 하려면 명령어가 너무 김   
+-> docker compose 이용
+
+### 테스트
+컨테이너에서 테스트 실행
+```
+docker run -it <이미지 이름> npm run test
+```
+-it: 결과를 더 보기 좋게 출력
+
+### 운영 환경
+웹서버를 왜 사용 하는가?
+
+개발환경 서버는 소스코드를 변경하면 자동으로 전체 앱을 다시 빌드해주는 기능이 있기 때문에 이러한 기능이 없어 더 가벼운 Nginx와 같은 웹서버 사용
+
+npm run build로 생성한 빌드 파일을 웹 브라우저의 요청에 따라 Nginx 서버가 응답으로 제공
+
+1. 빌드 파일 생성(builder stage)
+2. Nginx 가동(run stage)
+
+컨테이너 실행
+```
+docker run -p 8080:80 <이미지 이름>
+```
+Nginx의 기본 포트는 80
