@@ -1,0 +1,29 @@
+version: "3"
+services: 
+  react:
+    build: 
+      # 도커 파일 경로
+      context: .
+      # 사용할 도커 파일
+      dockerfile: Dockerfile.dev
+    ports: 
+      - "3000:3000"
+    # 볼륨 설정
+    volumes: 
+      - /usr/src/app/node_modules
+      - ./:/usr/src/app
+    environment: 
+      # 리액트 핫 리로딩 적용(윈도우)
+      - CHOKIDAR_USEPOLLING=true
+    # 리액트 앱을 끌 때 필요
+    stdin_open: true
+  # 테스트용
+  test:
+    build: 
+      context: .
+      dockerfile: Dockerfile.dev
+    volumes: 
+      - /usr/src/app/node_modules
+      - ./:/usr/src/app
+    # 시작 시 명령어 바꿈
+    command: ["npm", "run", "test"]
