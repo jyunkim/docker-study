@@ -4,14 +4,14 @@ sudo: required
 # 언어(플랫폼) 선택
 language: generic
 
-# 도커 환경 구성
+# 도커 환경 구성 - EB에서 도커 파일을 찾아서 이미지 빌드
 services:
   - docker
 
 # 스크립트 실행 환경 구성
 before_install:
   - echo "Start creating an image with dockerfile"
-  - docker build -t jyunkim/docker-react-app -f ./docker-react-app/Dockerfile.dev .
+  - docker build -t jyunkim/docker-react-app -f Dockerfile.dev .
 
 # 실행할 스크립트(테스트 실행)
 script:
@@ -40,4 +40,4 @@ deploy:
     branch: main
   # AWS access key
   access_key_id: $AWS_ACCESS_KEY
-  secret_access_key: $$AWS_SECRET_ACCESS_KEY
+  secret_access_key: $AWS_SECRET_ACCESS_KEY

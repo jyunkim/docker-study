@@ -17,7 +17,7 @@ RUN npm run build
 
 FROM nginx
 
-# 컨테이너에서 listen할 포트
+# Elastic BeanStalk 사용 시 앱이 몇번 포트에서 돌아가고 있는지 알려주어야 함
 EXPOSE 80
 
 # 다른 stage에 있는 파일을 복사할 때 stage 이름을 명시해줘야 함
