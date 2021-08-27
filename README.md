@@ -119,12 +119,18 @@ docker rm <컨테이너 id/이름>
 
 ### 모든 컨테이너 삭제
 ```
-docker rm `docker ps -a -q`
+docker rm $(docker ps -a -q)
 ```
 
 ### 이미지 삭제
 ```
 docker rmi <이미지 id>
+```
+여러개 삭제 가능
+
+### 모든 이미지 삭제
+```
+docker rmi $(docker images -q)
 ```
 
 ### 컨테이너, 이미지, 네트워크, 빌드 캐시 삭제
@@ -414,3 +420,37 @@ npm run build로 생성한 빌드 파일을 웹 브라우저의 요청에 따라
 docker run -p 8080:80 <이미지 이름>
 ```
 Nginx의 기본 포트는 80
+
+### Travis CI
+Github에서 진행되는 오픈소스 프로젝트를 위한 지속적인 통합(CI) 서비스   
+프로젝트를 특정 이벤트에 따라 자동으로 테스트, 빌드, 배포해줌   
+Private 레포지토리에 경우 유료
+
+1. Github master 저장소에 소스 push
+2. Travis CI가 업데이트된 소스를 가져와 테스트 코드 실행
+3. 테스트가 성공하면 AWS와 같은 호스팅 사이트로 보내서 배포
+
+https://docs.travis-ci.com/user/languages/minimal-and-generic/
+
+### Elastic BeanStalk
+웹 애플리케이션을 쉽게 배포하고 확장해주는 서비스   
+EC2 인스턴스를 포함한 환경을 구성하여 소프트웨어를 업데이트 할 때마다 자동으로 환경 관리
+
+![image](https://user-images.githubusercontent.com/68456385/131105518-fb4c73d4-32f2-418c-bfc6-a6008fc8a906.png)
+트래픽이 많아지면 EC2 인스턴스가 추가되면서 로드밸런서로 관리됨   
+
+Travis CI에서 가지고 있는 파일을 압축해서 EB안에 자동으로 생성된 S3로 보냄
+
+소스 파일을 배포하기 위해선 secret key 필요
+
+**IAM(Identity and Access Management)**   
+AWS 리소스에 대한 액세스를 안전하게 제어할 수 있는 웹 서비스   
+IAM을 사용하여 리소스를 사용하도록 인증 및 권한 부여된 대상을 제어   
+Root 사용자(AWS 서비스 및 리소스에 대한 완전한 엑세스 권한 보유)가 부여한 권한만 가지고 있음   
+AdministratorAccess-AWSElasticBeanstalk 부여
+
+AWS Secret ACCESS Key는 travis-ci 레포지토리 More options - Settings - Environment Variables에 저장
+
+테스트 성공 후 전체 소스를 AWS에서 던져서 EB 안에서 따로 이미지를 만들고 컨테이너를 생성해서 앱을 실행함   
+그때 EB는 플랫폼 설정을 docker로 해주어서 Dockerfile을 찾아서 이미지를 알아서 빌드해줌   
+-> Dockerfile.dev가 아닌 Dockerfile로 배포됨
