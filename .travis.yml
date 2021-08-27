@@ -20,3 +20,24 @@ script:
 # 테스트 성공 후 할 일
 after_success:
   - echo "Test success"
+
+# 배포 설정
+deploy:
+  # 외부 서비스 명시
+  provider: elasticbeanstalk
+  # AWS 리전
+  region: "ap-northeast-2"
+  # 애플리케이션 이름
+  app: "docker-react-app"
+  # Elastic BeanStalk 환경 이름
+  env: "Dockerreactapp-env"
+  # AWS S3 버켓 이름
+  bucket_name: "elasticbeanstalk-ap-northeast-2-576323816895"
+  # 애플리케이션 이름과 동일
+  bucket_path: "docker-react-app"
+  # 어떤 branch에 push할 때 AWS로 배포할 것인지 명시
+  on:
+    branch: main
+  # AWS access key
+  access_key_id: $AWS_ACCESS_KEY
+  secret_access_key: $$AWS_SECRET_ACCESS_KEY
