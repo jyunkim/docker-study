@@ -437,6 +437,7 @@ https://docs.travis-ci.com/user/languages/minimal-and-generic/
 EC2 인스턴스를 포함한 환경을 구성하여 소프트웨어를 업데이트 할 때마다 자동으로 환경 관리
 
 ![image](https://user-images.githubusercontent.com/68456385/131105518-fb4c73d4-32f2-418c-bfc6-a6008fc8a906.png)
+
 트래픽이 많아지면 EC2 인스턴스가 추가되면서 로드밸런서로 관리됨   
 
 Travis CI에서 가지고 있는 파일을 압축해서 EB안에 자동으로 생성된 S3로 보냄
@@ -447,8 +448,8 @@ Travis CI에서 가지고 있는 파일을 압축해서 EB안에 자동으로 �
 AWS 리소스에 대한 액세스를 안전하게 제어할 수 있는 웹 서비스   
 IAM을 사용하여 리소스를 사용하도록 인증 및 권한 부여된 대상을 제어   
 Root 사용자(AWS 서비스 및 리소스에 대한 완전한 엑세스 권한 보유)가 부여한 권한만 가지고 있음   
-AdministratorAccess-AWSElasticBeanstalk 부여
 
+AdministratorAccess-AWSElasticBeanstalk 부여   
 AWS Secret ACCESS Key는 travis-ci 레포지토리 More options - Settings - Environment Variables에 저장
 
 테스트 성공 후 전체 소스를 AWS에서 던져서 EB 안에서 따로 이미지를 만들고 컨테이너를 생성해서 앱을 실행함   
